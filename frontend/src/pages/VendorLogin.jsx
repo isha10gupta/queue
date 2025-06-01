@@ -8,23 +8,30 @@ const VendorLogin = () => {
 
   const handleLogin = async (credentials) => {
     try {
-   const res = await axios.post('http://localhost:3000/api/auth/student/login', credentials);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/vendor/login`,
+        credentials
+      );
 
+      // ✅ Defensive check for backend response
+      const vendor = res.data?.vendor;
 
-      if (res.data.success) {
+      if (res.data.success && vendor?.id) {
+        localStorage.setItem('vendorId', vendor.id);
+        localStorage.setItem('vendorName', vendor.email); // Optional for greeting
         alert('Login successful');
         navigate('/vendor/dashboard');
       } else {
         alert('Login failed: ' + (res.data.message || 'Invalid credentials'));
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('Login error: ' + (error.response?.data?.message || 'Server error'));
+    } catch (err) {
+      console.error('Vendor login error:', err);
+      alert('Login error: ' + (err.response?.data?.message || 'Server error'));
     }
   };
 
   const fields = [
-    { name: 'username', type: 'text', placeholder: 'Username' },
+    { name: 'email', type: 'email', placeholder: 'Email' },
     { name: 'password', type: 'password', placeholder: 'Password' },
   ];
 

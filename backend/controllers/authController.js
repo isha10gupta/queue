@@ -30,25 +30,35 @@ exports.studentSignup = async (req, res) => {
 // ✅ Student Login
 exports.studentLogin = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const [rows] = await pool.query('SELECT * FROM students WHERE email = ?', [email]);
+
     if (rows.length === 0) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Student not found' });
     }
-    const user = rows[0];
-    const match = await bcrypt.compare(password, user.password);
+
+    const student = rows[0];
+    const match = await bcrypt.compare(password, student.password);
+
     if (!match) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Incorrect password' });
     }
-    res.json({
+
+    res.status(200).json({
       success: true,
-      userId: user.id,
-      username: user.name,
-      usn: user.usn,
+      message: 'Login successful',
+      student: {
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        usn: student.usn
+      }
     });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Login failed' });
+    console.error('❌ Login error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -76,7 +86,7 @@ exports.vendorSignup = async (req, res) => {
   }
 };
 
-// ✅ Vendor Login
+// ✅ Vendor Login (🔧 FIXED RETURN STRUCTURE)
 exports.vendorLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -91,12 +101,17 @@ exports.vendorLogin = async (req, res) => {
     }
     res.json({
       success: true,
-      userId: user.id,
-      username: user.username,
-      shopName: user.shop_name,
+      message: 'Login successful',
+      vendor: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        shopName: user.shop_name
+      }
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Login failed' });
   }
 };
+

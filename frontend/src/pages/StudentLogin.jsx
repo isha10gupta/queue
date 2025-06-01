@@ -14,6 +14,10 @@ const StudentLogin = () => {
       );
 
       if (res.data.success) {
+        // ✅ Store student info in localStorage
+        localStorage.setItem('studentId', res.data.student.id);
+        localStorage.setItem('studentName', res.data.student.name);
+
         alert('Login successful');
         navigate('/student/dashboard');
       } else {
@@ -26,7 +30,7 @@ const StudentLogin = () => {
   };
 
   const fields = [
-    { name: 'usn', type: 'text', placeholder: 'USN' },
+    { name: 'email', type: 'email', placeholder: 'Email' },
     { name: 'password', type: 'password', placeholder: 'Password' },
   ];
 
