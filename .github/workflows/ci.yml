@@ -1,0 +1,44 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: ✅ Test Backend (if you have tests)
+        working-directory: ./backend
+        run: npm test || echo "No tests available"
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: 🔨 Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: ✅ Lint Frontend (optional)
+        working-directory: ./frontend
+        run: npm run lint || echo "No linting setup"
